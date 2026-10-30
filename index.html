@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ColorCodes</title>
+  <meta name="description" content="Enter a color and discover main and accent colors that pair well with it." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated background built from the chosen palette -->
+  <div class="backdrop" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <span class="blob b4"></span>
+  </div>
+
+  <main class="app">
+    <header class="glass hero">
+      <h1>ColorCodes</h1>
+      <p class="subtitle">Enter a color to find a second main color and accents that pair with it.</p>
+
+      <form id="colorForm" class="input-row" autocomplete="off">
+        <input type="color" id="colorPicker" value="#0a84ff" aria-label="Pick a color" />
+        <input type="text" id="colorText" value="#0A84FF" placeholder="#0A84FF, coral, rgb(255,0,0)" aria-label="Color value" />
+        <button type="submit" class="btn primary">Find matches</button>
+      </form>
+      <p id="mainName" class="main-name"></p>
+      <p id="error" class="error" role="alert"></p>
+    </header>
+
+    <section class="glass">
+      <div class="section-head">
+        <h2>Suggestions</h2>
+        <div class="segmented" role="radiogroup" aria-label="What are you choosing?">
+          <button type="button" class="seg active" data-role="second" role="radio" aria-checked="true">Second main color</button>
+          <button type="button" class="seg" data-role="accent" role="radio" aria-checked="false">Accents</button>
+        </div>
+      </div>
+      <p class="hint" id="hint">Tap a swatch to set your second main color.</p>
+      <div id="suggestions" class="suggestions">
+        <p class="loading">Loading…</p>
+      </div>
+    </section>
+
+    <section class="glass">
+      <div class="section-head">
+        <h2>Your palette</h2>
+        <div class="actions">
+          <button type="button" id="copyCss" class="btn">Copy CSS</button>
+          <button type="button" id="reset" class="btn">Reset</button>
+        </div>
+      </div>
+      <div id="palette" class="palette"></div>
+    </section>
+
+    <footer class="footer">Color names &amp; schemes by <a href="https://www.thecolorapi.com" target="_blank" rel="noopener">The Color API</a></footer>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
