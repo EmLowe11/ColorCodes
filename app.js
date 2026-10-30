@@ -2,7 +2,7 @@
 // Uses the free The Color API (https://www.thecolorapi.com), with a local fallback.
 
 const API = "https://www.thecolorapi.com";
-const MAX_ACCENTS = 4;
+const MAX_PICKS = 4; // per list: other colors and accents
 
 const SCHEMES = [
   { mode: "complement", label: "Complementary" },
@@ -14,9 +14,9 @@ const SCHEMES = [
 
 const state = {
   main: "#0A84FF",
-  second: null,
-  accents: [],
-  role: "second", // which slot a swatch click fills
+  others: [], // other colors (up to 4)
+  accents: [], // accent colors (up to 4)
+  role: "others", // which list a swatch click fills
   names: {}, // hex -> color name
   suggestions: [], // [{label, colors: [hex]}]
 };
@@ -132,9 +132,9 @@ function renderSuggestions() {
       btn.style.color = textOn(hex);
       btn.title = state.names[hex] ? `${state.names[hex]} · ${hex}` : hex;
       btn.innerHTML = `<span class="hex">${hex}</span>`;
-      if (state.second === hex) {
-        btn.classList.add("is-second");
-        btn.insertAdjacentHTML("beforeend", `<span class="badge">2nd</span>`);
+      if (state.others.includes(hex)) {
+        btn.classList.add("is-other");
+        btn.insertAdjacentHTML("beforeend", `<span class="badge">Color</span>`);
       } else if (state.accents.includes(hex)) {
         btn.classList.add("is-accent");
         btn.insertAdjacentHTML("beforeend", `<span class="badge">Accent</span>`);
@@ -170,10 +170,26 @@ function renderPalette() {
   const p = $("palette");
   p.innerHTML = "";
   p.appendChild(chip("Main", state.main));
-  p.appendChild(chip("Second main", state.second));
+  state.others.forEach((hex, i) => p.appendChild(chip(`Color ${i + 1}`, hex)));
+  if (state.others.length === 0) p.appendChild(chip("Color", null));
   state.accents.forEach((hex, i) => p.appendChild(chip(`Accent ${i + 1}`, hex)));
   if (state.accents.length === 0) p.appendChild(chip("Accent", null));
+  renderPreview();
   updateBackground();
+}
+
+// Show every chosen color side by side: main largest, then colors, then thin accents.
+function renderPreview() {
+  const strip = $("preview");
+  strip.innerHTML = "";
+  const parts = [[state.main, 4], ...state.others.map((c) => [c, 2]), ...state.accents.map((c) => [c, 1])];
+  parts.forEach(([hex, grow]) => {
+    const seg = document.createElement("div");
+    seg.style.background = hex;
+    seg.style.flexGrow = grow;
+    seg.title = hex;
+    strip.appendChild(seg);
+  });
 }
 
 // Blend the palette into the animated background.
@@ -182,9 +198,9 @@ function updateBackground() {
   const pick = (i) => fallback[i] || state.main;
   const colors = [
     state.main,
-    state.second || pick(2),
-    state.accents[0] || pick(8),
-    state.accents[1] || state.accents[0] || pick(14),
+    state.others[0] || pick(2),
+    state.accents[0] || state.others[1] || pick(8),
+    state.accents[1] || state.others[2] || state.accents[0] || pick(14),
   ];
   const root = document.documentElement.style;
   colors.forEach((c, i) => root.setProperty(`--c${i + 1}`, c));
@@ -200,19 +216,17 @@ function render() {
 // ---------- Actions ----------
 
 function choose(hex) {
-  if (state.role === "second") {
-    state.second = state.second === hex ? null : hex;
-    state.accents = state.accents.filter((a) => a !== hex);
+  const key = state.role;
+  const other = key === "others" ? "accents" : "others";
+  const list = state[key];
+  if (list.includes(hex)) {
+    state[key] = list.filter((c) => c !== hex);
+  } else if (list.length >= MAX_PICKS) {
+    toast(`Up to ${MAX_PICKS} ${key === "others" ? "colors" : "accents"} — tap one to remove it`);
+    return;
   } else {
-    if (state.accents.includes(hex)) {
-      state.accents = state.accents.filter((a) => a !== hex);
-    } else if (state.accents.length >= MAX_ACCENTS) {
-      toast(`Up to ${MAX_ACCENTS} accents — tap one to remove it`);
-      return;
-    } else {
-      state.accents.push(hex);
-      if (state.second === hex) state.second = null;
-    }
+    list.push(hex);
+    state[other] = state[other].filter((c) => c !== hex);
   }
   render();
 }
@@ -225,20 +239,20 @@ function setRole(role) {
     b.setAttribute("aria-checked", on);
   });
   $("hint").textContent =
-    role === "second"
-      ? "Tap a swatch to set your second main color."
-      : `Tap swatches to add accent colors (up to ${MAX_ACCENTS}).`;
+    role === "others"
+      ? `Tap swatches to add colors that go with your main color (up to ${MAX_PICKS}).`
+      : `Tap swatches to add accent colors (up to ${MAX_PICKS}).`;
 }
 
 async function loadColor(hex) {
   state.main = hex;
-  state.second = null;
+  state.others = [];
   state.accents = [];
   picker.value = hex.toLowerCase();
   text.value = hex;
   $("error").textContent = "";
   $("suggestions").innerHTML = `<p class="loading">Finding matches…</p>`;
-  setRole("second");
+  setRole("others");
   updateBackground();
 
   const [name, ...lists] = await Promise.all([
@@ -291,14 +305,14 @@ document.querySelectorAll(".seg").forEach((b) =>
 );
 
 $("reset").addEventListener("click", () => {
-  state.second = null;
+  state.others = [];
   state.accents = [];
   render();
 });
 
 $("copyCss").addEventListener("click", () => {
   const lines = [`  --color-main: ${state.main};`];
-  if (state.second) lines.push(`  --color-second: ${state.second};`);
+  state.others.forEach((c, i) => lines.push(`  --color-${i + 1}: ${c};`));
   state.accents.forEach((a, i) => lines.push(`  --color-accent-${i + 1}: ${a};`));
   copy(`:root {\n${lines.join("\n")}\n}`, "Palette copied as CSS variables");
 });

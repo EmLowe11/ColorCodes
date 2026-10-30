@@ -18,8 +18,9 @@
 
   <main class="app">
     <header class="glass hero">
+      <p class="greeting">Hi, Emory Lowe 👋</p>
       <h1>ColorCodes</h1>
-      <p class="subtitle">Enter a color to find a second main color and accents that pair with it.</p>
+      <p class="subtitle">Enter a main color, then pick up to 4 colors and 4 accents to see how they look together.</p>
 
       <form id="colorForm" class="input-row" autocomplete="off">
         <input type="color" id="colorPicker" value="#0a84ff" aria-label="Pick a color" />
@@ -34,11 +35,11 @@
       <div class="section-head">
         <h2>Suggestions</h2>
         <div class="segmented" role="radiogroup" aria-label="What are you choosing?">
-          <button type="button" class="seg active" data-role="second" role="radio" aria-checked="true">Second main color</button>
-          <button type="button" class="seg" data-role="accent" role="radio" aria-checked="false">Accents</button>
+          <button type="button" class="seg active" data-role="others" role="radio" aria-checked="true">Colors</button>
+          <button type="button" class="seg" data-role="accents" role="radio" aria-checked="false">Accents</button>
         </div>
       </div>
-      <p class="hint" id="hint">Tap a swatch to set your second main color.</p>
+      <p class="hint" id="hint">Tap swatches to add colors that go with your main color (up to 4).</p>
       <div id="suggestions" class="suggestions">
         <p class="loading">Loading…</p>
       </div>
@@ -52,6 +53,7 @@
           <button type="button" id="reset" class="btn">Reset</button>
         </div>
       </div>
+      <div id="preview" class="preview" aria-label="All chosen colors together"></div>
       <div id="palette" class="palette"></div>
     </section>
 

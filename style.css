@@ -89,6 +89,7 @@ body {
   padding: 24px;
 }
 
+.greeting { margin: 0 0 4px; font-size: 1.05rem; font-weight: 500; color: var(--muted); }
 h1 { margin: 0; font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 700; letter-spacing: -0.03em; }
 h2 { margin: 0; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
 .subtitle { margin: 6px 0 20px; color: var(--muted); }
@@ -220,7 +221,7 @@ input[type="text"]:focus { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.4); }
   font-weight: 600;
   letter-spacing: 0.02em;
 }
-.swatch.is-second, .swatch.is-accent { border-color: var(--text); }
+.swatch.is-other, .swatch.is-accent { border-color: var(--text); }
 .swatch .badge {
   position: absolute;
   top: 6px;
@@ -234,6 +235,17 @@ input[type="text"]:focus { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.4); }
 }
 
 /* ---------- Palette ---------- */
+.preview {
+  display: flex;
+  height: 72px;
+  margin-top: 16px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+.preview div { flex-basis: 0; transition: flex-grow 0.3s ease; }
+
 .palette {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
