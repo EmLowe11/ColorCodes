@@ -1,8 +1,4 @@
 :root {
-  --c1: #0a84ff;
-  --c2: #5e5ce6;
-  --c3: #ff375f;
-  --c4: #30d158;
   --text: #1d1d1f;
   --muted: rgba(29, 29, 31, 0.6);
   --glass: rgba(255, 255, 255, 0.45);
@@ -46,20 +42,15 @@ body {
   background: var(--bg);
 }
 
+/* Blobs are created by app.js — one per palette color, smaller as more are added. */
 .blob {
   position: absolute;
-  width: 60vmax;
-  height: 60vmax;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(70px);
   opacity: 0.7;
-  transition: background 1.2s ease;
-  mix-blend-mode: normal;
+  translate: -50% -50%;
+  transition: background 1.2s ease, width 0.8s ease, height 0.8s ease, left 0.8s ease, top 0.8s ease;
 }
-.b1 { background: var(--c1); top: -20vmax; left: -15vmax; animation: drift1 22s ease-in-out infinite alternate; }
-.b2 { background: var(--c2); bottom: -25vmax; right: -15vmax; animation: drift2 26s ease-in-out infinite alternate; }
-.b3 { background: var(--c3); top: 30%; left: 40%; width: 40vmax; height: 40vmax; animation: drift3 30s ease-in-out infinite alternate; }
-.b4 { background: var(--c4); bottom: -10vmax; left: -10vmax; width: 35vmax; height: 35vmax; animation: drift1 34s ease-in-out infinite alternate-reverse; }
 
 @keyframes drift1 { to { transform: translate(18vw, 14vh) scale(1.15); } }
 @keyframes drift2 { to { transform: translate(-16vw, -12vh) scale(1.1); } }

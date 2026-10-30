@@ -196,14 +196,31 @@ function renderPreview() {
 function updateBackground() {
   const fallback = state.suggestions.flatMap((s) => s.colors);
   const pick = (i) => fallback[i] || state.main;
-  const colors = [
-    state.main,
-    state.others[0] || pick(2),
-    state.accents[0] || state.others[1] || pick(8),
-    state.accents[1] || state.others[2] || state.accents[0] || pick(14),
-  ];
-  const root = document.documentElement.style;
-  colors.forEach((c, i) => root.setProperty(`--c${i + 1}`, c));
+  const colors = [state.main, ...state.others, ...state.accents];
+  // Until a few colors are chosen, fill in with suggestions so the background stays lively.
+  [2, 8, 14].forEach((i) => colors.length < 4 && colors.push(pick(i)));
+
+  const backdrop = $("backdrop");
+  while (backdrop.children.length < colors.length) {
+    const blob = document.createElement("span");
+    blob.className = "blob";
+    const n = backdrop.children.length;
+    blob.style.animation = `drift${(n % 3) + 1} ${22 + n * 3}s ease-in-out infinite ${n % 2 ? "alternate-reverse" : "alternate"}`;
+    backdrop.appendChild(blob);
+  }
+  while (backdrop.children.length > colors.length) backdrop.lastChild.remove();
+
+  // Blobs shrink as the palette grows; spread them around the screen with the golden angle.
+  const size = Math.max(24, 70 - (colors.length - 4) * 8);
+  colors.forEach((c, i) => {
+    const blob = backdrop.children[i];
+    const angle = i * 137.5 * (Math.PI / 180);
+    const radius = i === 0 ? 0.15 : 0.25 + 0.2 * Math.sqrt(i / colors.length);
+    blob.style.background = c;
+    blob.style.width = blob.style.height = `${i === 0 ? size * 1.2 : size}vmax`;
+    blob.style.left = `${50 + Math.cos(angle) * radius * 100 - (i === 0 ? 25 : 0)}%`;
+    blob.style.top = `${50 + Math.sin(angle) * radius * 100 - (i === 0 ? 25 : 0)}%`;
+  });
   document.querySelector(".btn.primary").style.background = state.main;
   document.querySelector(".btn.primary").style.color = textOn(state.main);
 }
